@@ -21,10 +21,19 @@ class LoginFragment : Fragment() {
 
         val button = view.findViewById<Button>(R.id.btn_register)
         button.setOnClickListener { goToRegister() }
+
+        view.findViewById<Button>(R.id.btn_login).setOnClickListener {
+            goToProducts()
+        }
     }
 
     private fun goToRegister() {
         val action = LoginFragmentDirections.actionLoginFragmentToRegisterFragment()
+        findNavController().navigate(action)
+    }
+
+    private fun goToProducts() {
+        val action = LoginFragmentDirections.actionLoginFragmentToProductsFragment()
         findNavController().navigate(action)
     }
 }

@@ -13,10 +13,19 @@
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_productsFragment"
+            app:destination="@id/productsFragment" />
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.cst.academy2024unibucfmi.fragments.RegisterFragment"
         android:label="RegisterFragment"
         tools:layout="@layout/fragment_register"/>
+
+    <fragment
+        android:id="@+id/productsFragment"
+        android:name="com.cst.academy2024unibucfmi.fragments.ProductsFragment"
+        android:label="ProductsFragment"
+        tools:layout="@layout/fragment_products"/>
 </navigation>
