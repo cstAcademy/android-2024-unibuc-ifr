@@ -12,7 +12,7 @@ import com.cst.academy2024unibucfmi.models.CategoryModel
 import com.cst.academy2024unibucfmi.models.ProductModel
 import com.cst.academy2024unibucfmi.utils.extensions.logErrorMessage
 
-class ProductListAdapter(
+class CartItemListAdapter(
     private val cartItemList: List<CartItemModel>
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
