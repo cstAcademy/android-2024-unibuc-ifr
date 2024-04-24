@@ -9,13 +9,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.cst.academy2024unibucfmi.R
 import com.cst.academy2024unibucfmi.adapters.CartItemListAdapter
 import com.cst.academy2024unibucfmi.models.CartItemModel
 import com.cst.academy2024unibucfmi.models.CategoryModel
 import com.cst.academy2024unibucfmi.models.ProductModel
-import com.cst.academy2024unibucfmi.models.api.ProductAPIResponse
+import com.cst.academy2024unibucfmi.models.api.ProductAPIResponseModel
+import com.cst.academy2024unibucfmi.utils.VolleyRequestQueue
 import com.cst.academy2024unibucfmi.utils.extensions.logErrorMessage
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -52,8 +52,6 @@ class ProductsFragment : Fragment() {
     }
 
     private fun getProducts() {
-        // Instantiate the RequestQueue.
-        val queue = Volley.newRequestQueue(context)
         val url = "https://fakestoreapi.com/products"
 
         // Request a string response from the provided URL.
@@ -68,12 +66,12 @@ class ProductsFragment : Fragment() {
             })
 
         // Add the request to the RequestQueue.
-        queue.add(stringRequest)
+        VolleyRequestQueue.addToRequestQueue(stringRequest)
     }
 
     private fun handleProductsResponse(response: String) {
-        val type = object: TypeToken<List<ProductAPIResponse>>() {}.type
-        val responseJsonArray = Gson().fromJson<List<ProductAPIResponse>>(response, type)
+        val type = object: TypeToken<List<ProductAPIResponseModel>>() {}.type
+        val responseJsonArray = Gson().fromJson<List<ProductAPIResponseModel>>(response, type)
 
         responseJsonArray
             .groupBy { it.category }
