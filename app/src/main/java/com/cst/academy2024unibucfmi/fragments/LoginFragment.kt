@@ -13,6 +13,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.cst.academy2024unibucfmi.BuildConfig
 import com.cst.academy2024unibucfmi.R
+import com.cst.academy2024unibucfmi.data.repositories.ProductRepository
 import com.cst.academy2024unibucfmi.models.api.LoginAPIRequestModel
 import com.cst.academy2024unibucfmi.models.api.LoginAPIResponseModel
 import com.cst.academy2024unibucfmi.utils.VolleyRequestQueue
@@ -38,13 +39,19 @@ class LoginFragment : Fragment() {
         usernameEditText = view.findViewById(R.id.et_username)
         passwordEditText = view.findViewById(R.id.et_password)
 
-        if(BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
             usernameEditText?.setText("mor_2314")
             passwordEditText?.setText("83r5^_")
         }
 
         val button = view.findViewById<Button>(R.id.btn_register)
-        button.setOnClickListener { goToRegister() }
+        button.setOnClickListener {
+            //goToRegister()
+
+            ProductRepository.getCategoryWithProducts { categoriesWithProducts ->
+                "data found".logErrorMessage()
+            }
+        }
 
         view.findViewById<Button>(R.id.btn_login).setOnClickListener {
             doLogin()

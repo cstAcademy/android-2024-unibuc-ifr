@@ -11,12 +11,15 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.cst.academy2024unibucfmi.R
 import com.cst.academy2024unibucfmi.adapters.CartItemListAdapter
+import com.cst.academy2024unibucfmi.data.repositories.ProductRepository
 import com.cst.academy2024unibucfmi.models.CartItemModel
 import com.cst.academy2024unibucfmi.models.CategoryModel
 import com.cst.academy2024unibucfmi.models.ProductModel
 import com.cst.academy2024unibucfmi.models.api.ProductAPIResponseModel
+import com.cst.academy2024unibucfmi.models.db.ProductDBModel
 import com.cst.academy2024unibucfmi.utils.VolleyRequestQueue
 import com.cst.academy2024unibucfmi.utils.extensions.logErrorMessage
+import com.cst.academy2024unibucfmi.utils.extensions.showToast
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -70,8 +73,12 @@ class ProductsFragment : Fragment() {
     }
 
     private fun handleProductsResponse(response: String) {
-        val type = object: TypeToken<List<ProductAPIResponseModel>>() {}.type
+        val type = object : TypeToken<List<ProductAPIResponseModel>>() {}.type
         val responseJsonArray = Gson().fromJson<List<ProductAPIResponseModel>>(response, type)
+
+        responseJsonArray.getOrNull(0)?.let { responseProduct ->
+            insertProductToDB(responseProduct)
+        }
 
         responseJsonArray
             .groupBy { it.category }
@@ -93,5 +100,12 @@ class ProductsFragment : Fragment() {
             }
 
         adapter.notifyItemRangeInserted(0, cartItemList.size)
+    }
+
+    // TODO add all products to local database
+    private fun insertProductToDB(productModel: ProductAPIResponseModel) {
+        ProductRepository.insert(productModel) {
+            "Product successfully inserted".showToast(context)
+        }
     }
 }
