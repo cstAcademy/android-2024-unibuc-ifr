@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
@@ -12,6 +14,7 @@ import com.android.volley.toolbox.StringRequest
 import com.cst.academy2024unibucfmi.R
 import com.cst.academy2024unibucfmi.adapters.CartItemListAdapter
 import com.cst.academy2024unibucfmi.data.repositories.ProductRepository
+import com.cst.academy2024unibucfmi.managers.SharedPrefsManager
 import com.cst.academy2024unibucfmi.models.CartItemModel
 import com.cst.academy2024unibucfmi.models.CategoryModel
 import com.cst.academy2024unibucfmi.models.ProductModel
@@ -43,6 +46,11 @@ class ProductsFragment : Fragment() {
         setupRecyclerView()
 
         getProducts()
+
+        view.findViewById<Button>(R.id.btn_log_out).setOnClickListener {
+            SharedPrefsManager.removeToken()
+            findNavController().popBackStack()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -58,15 +66,25 @@ class ProductsFragment : Fragment() {
         val url = "https://fakestoreapi.com/products"
 
         // Request a string response from the provided URL.
-        val stringRequest = StringRequest(
-            Request.Method.GET,
+        val stringRequest = object: StringRequest(
+            Method.GET,
             url,
             { response ->
                 handleProductsResponse(response)
             },
             {
                 "That didn't work!".logErrorMessage()
-            })
+            }) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+
+                SharedPrefsManager.readToken()?.let {  token ->
+                    headers["Authorization"] = "Bearer $token"
+                }
+
+                return super.getHeaders()
+            }
+        }
 
         // Add the request to the RequestQueue.
         VolleyRequestQueue.addToRequestQueue(stringRequest)

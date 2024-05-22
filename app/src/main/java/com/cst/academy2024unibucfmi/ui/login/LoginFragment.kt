@@ -1,6 +1,7 @@
 package com.cst.academy2024unibucfmi.ui.login
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.android.volley.toolbox.StringRequest
 import com.cst.academy2024unibucfmi.BuildConfig
 import com.cst.academy2024unibucfmi.R
 import com.cst.academy2024unibucfmi.databinding.FragmentLoginBinding
+import com.cst.academy2024unibucfmi.managers.SharedPrefsManager
 import com.cst.academy2024unibucfmi.models.api.LoginAPIRequestModel
 import com.cst.academy2024unibucfmi.models.api.LoginAPIResponseModel
 import com.cst.academy2024unibucfmi.utils.VolleyRequestQueue
@@ -98,6 +100,9 @@ class LoginFragment : Fragment(), LoginFragmentListener {
             { response ->
                 Gson().fromJson(response, LoginAPIResponseModel::class.java).let { responseModel ->
                     responseModel.token.showToast(context)
+
+                    SharedPrefsManager.writeToken(responseModel.token)
+
                     goToProducts()
                 }
             },
