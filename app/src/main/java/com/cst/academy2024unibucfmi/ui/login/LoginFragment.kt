@@ -1,19 +1,20 @@
-package com.cst.academy2024unibucfmi.fragments
+package com.cst.academy2024unibucfmi.ui.login
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.cst.academy2024unibucfmi.BuildConfig
 import com.cst.academy2024unibucfmi.R
-import com.cst.academy2024unibucfmi.data.repositories.ProductRepository
+import com.cst.academy2024unibucfmi.databinding.FragmentLoginBinding
 import com.cst.academy2024unibucfmi.models.api.LoginAPIRequestModel
 import com.cst.academy2024unibucfmi.models.api.LoginAPIResponseModel
 import com.cst.academy2024unibucfmi.utils.VolleyRequestQueue
@@ -21,40 +22,44 @@ import com.cst.academy2024unibucfmi.utils.extensions.logErrorMessage
 import com.cst.academy2024unibucfmi.utils.extensions.showToast
 import com.google.gson.Gson
 
-class LoginFragment : Fragment() {
+class LoginFragment : Fragment(), LoginFragmentListener {
 
-    private var usernameEditText: EditText? = null
-    private var passwordEditText: EditText? = null
+    private lateinit var binding: FragmentLoginBinding
+
+    private val viewModel: LoginFragmentViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.fragment_login, container, false)
+    ): View {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false)
 
-    @SuppressLint("SetTextI18n")
+        binding.listener = this
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        usernameEditText = view.findViewById(R.id.et_username)
-        passwordEditText = view.findViewById(R.id.et_password)
-
         if (BuildConfig.DEBUG) {
-            usernameEditText?.setText("mor_2314")
-            passwordEditText?.setText("83r5^_")
+            viewModel.username.value = "mor_2314"
+            viewModel.password.set("83r5^_")
         }
 
-        val button = view.findViewById<Button>(R.id.btn_sign_up)
-        button.setOnClickListener {
-            goToRegister()
-        }
+        setupObservables()
+    }
 
-        view.findViewById<Button>(R.id.btn_login).setOnClickListener {
-            doLogin()
+    private fun setupObservables() {
+        viewModel.loginModel.observe(viewLifecycleOwner) { loginModel ->
+            doLogin(loginModel)
         }
     }
 
-    private fun goToRegister() {
+    override fun goToRegister() {
         val action = LoginFragmentDirections.actionLoginFragmentToRegisterFragment()
         findNavController().navigate(action)
     }
@@ -64,22 +69,21 @@ class LoginFragment : Fragment() {
         findNavController().navigate(action)
     }
 
-    private fun doLogin() {
-        val username = when (usernameEditText?.text?.isNotEmpty()) {
-            true -> usernameEditText?.text.toString()
-            else -> {
-                getString(R.string.authentication_invalid_username).showToast(context)
-                return
-            }
-        }
-        val password = when (passwordEditText?.text?.isNotEmpty()) {
-            true -> passwordEditText?.text.toString()
-            else -> {
-                getString(R.string.authentication_invalid_password).showToast(context)
-                return
-            }
-        }
-
+    private fun doLogin(loginModel: LoginAPIRequestModel) {
+//        val username = when (viewModel.username.get()?.isNotEmpty()) {
+//            true -> viewModel.username.get() ?: ""
+//            else -> {
+//                getString(R.string.authentication_invalid_username).showToast(context)
+//                return
+//            }
+//        }
+//        val password = when (viewModel.password.get()?.isNotEmpty()) {
+//            true -> viewModel.password.get() ?: ""
+//            else -> {
+//                getString(R.string.authentication_invalid_password).showToast(context)
+//                return
+//            }
+//        }
 //        val loginAPIRequestModel = LoginAPIRequestModel(
 //            username = username,
 //            password = password
@@ -102,8 +106,8 @@ class LoginFragment : Fragment() {
             }) {
             override fun getParams(): MutableMap<String, String> {
                 val params: MutableMap<String, String> = HashMap()
-                params["username"] = username
-                params["password"] = password
+                params["username"] = loginModel.username
+                params["password"] = loginModel.password
 
                 return params
             }
@@ -112,4 +116,13 @@ class LoginFragment : Fragment() {
         // Add the request to the RequestQueue.
         VolleyRequestQueue.addToRequestQueue(stringRequest)
     }
+
+    override fun forgotPassword() {
+
+    }
+}
+
+interface LoginFragmentListener {
+    fun forgotPassword()
+    fun goToRegister()
 }
